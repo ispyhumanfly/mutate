@@ -1,0 +1,95 @@
+#!/usr/bin/env perl
+
+BEGIN {
+
+    if ((exists $ENV{MUTATE_HOME}) and (-d $ENV{MUTATE_HOME})) {
+        system "$ENV{MUTATE_HOME}/mbootstrap";
+    }
+    else {
+        die
+          "You must set MUTATE_HOME to the directory where Mutate is located.\n";        
+    }
+}
+
+use 5.010_000;
+use strict;
+use warnings;
+
+use Getopt::Long qw/:config no_ignore_case /;
+use Pod::Usage;
+use File::Find;
+
+
+my %obj;
+
+GetOptions(
+    
+    'help|?|h'   => \$obj{options}->{'help'},
+    'preset|p=s' => \$obj{options}->{'preset'}
+);
+
+pod2usage "\nmreader, Read A/V Media Data\n"
+  if defined $obj{options}->{help}
+  or not $ARGV[0];
+
+unless (defined $obj{options}->{preset})
+{
+    $obj{options}->{preset} = 'normal';
+}
+
+find(\&process, @ARGV);
+
+sub process {
+
+    if ($File::Find::name
+        =~ /\.(mp2|mp3|mp4|mkv|mov|avi|wmv|webm|ogg|flv|vob)$/x)
+    {
+
+        my @crop_detect;
+
+        say "$File::Find::name";
+
+        open my $mplayer,
+
+          "mplayer \"$_\" -include $ENV{MUTATE_HOME}/presets/mreader.$obj{options}->{preset} "
+          . " -profile $obj{options}->{preset} 2> /tmp/.mutate/mreader.err |";
+
+        for (<$mplayer>) {
+            when (/\w+:=(.*)/x) {
+                say "\t" . lc($1) . " = $2";
+            }
+            when (/ID_(\w+)=(.*)/x) {
+                say "\t" . lc($1) . " = $2";
+            }
+            when (/ID_(\w+)_(\w+)=(.*)/x) {
+                say "\t" . lc("$1 $2") . " = $3";
+            }
+            when (/.*crop=(\d+:\d+:\d+:\d+)/x) {
+                push @crop_detect, $1;
+            }
+        }
+
+        if (scalar @crop_detect > 1) {
+            say "\tcrop = " . $crop_detect[-1];
+        }
+
+        close $mplayer;
+    }
+}
+
+exit(0);
+
+__END__
+
+=head1 SYNOPSIS
+
+</directory/to/scan> [options]
+
+Options:
+
+    -h, -?, --help  This help / usage screen...
+    -p, --preset    Type 'mpresets mreader' for a complete list of presets.
+
+Example: mreader ~/Videos/movie.mp4
+
+=cut

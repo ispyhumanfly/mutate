@@ -1,0 +1,70 @@
+#!/usr/bin/env perl
+
+BEGIN {
+
+    if ((exists $ENV{MUTATE_HOME}) and (-d $ENV{MUTATE_HOME})) {
+        system "$ENV{MUTATE_HOME}/mbootstrap";
+    }
+    else {
+        die
+          "You must set MUTATE_HOME to the directory where Mutate is located.\n";
+    }
+}
+
+use 5.010_000;
+use strict;
+use warnings;
+
+use Getopt::Long qw/:config no_ignore_case /;
+use Pod::Usage;
+
+use File::Find;
+use File::Basename;
+
+my %obj;
+
+GetOptions(
+
+    'help|?|h' => \$obj{options}->{'help'},
+);
+
+pod2usage "\nmpresets, Display Mutate Presets\n"
+  if defined $obj{options}->{help}
+  or not $ARGV[0];
+
+find(\&process, "$ENV{MUTATE_HOME}/presets/");
+
+sub process {
+
+    if (basename($File::Find::name) =~ /(\w+).(\w+)/) {
+        push @{$obj{presets}->{$1}}, $2;
+    }
+}
+
+for my $command (@ARGV) {
+    
+    for (keys %{$obj{presets}}) {
+    
+        if ($command eq $_) {
+        
+            say $_;
+            say "\t$_" for @{$obj{presets}->{$_}};
+        }
+    }
+}
+
+exit(0);
+
+__END__
+
+=head1 SYNOPSIS
+
+<command> [options]
+
+Options:
+
+    -h, -?, --help  This help / usage screen...
+
+Example: mpresets mreader mwriter
+
+=cut

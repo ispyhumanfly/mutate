@@ -1,0 +1,79 @@
+#!/usr/bin/env perl
+
+BEGIN {
+
+    if ((exists $ENV{MUTATE_HOME}) and (-d $ENV{MUTATE_HOME})) {
+        system "$ENV{MUTATE_HOME}/mbootstrap";
+    }
+    else {
+        die
+          "You must set MUTATE_HOME to the directory where Mutate is located.\n";        
+    }
+}
+
+use 5.010_000;
+use strict;
+use warnings;
+
+use Getopt::Long qw/:config no_ignore_case /;
+use Pod::Usage;
+use Cwd qw/ realpath /;
+
+
+my %obj;
+
+GetOptions(
+
+    'help|?|h'   => \$obj{options}->{'help'},
+    'preset|p=s' => \$obj{options}->{'preset'}
+);
+
+pod2usage "\nmwriter, 2-Pass A/V Encoder\n"
+  if defined $obj{options}->{help}
+  or not $ARGV[0]
+  or not $ARGV[1];
+
+unless (defined $obj{options}->{preset})
+{
+    $obj{options}->{preset} = 'fastcopy';
+}
+
+open my $mreader,
+
+  "mreader \"$ARGV[0]\" -p cropdetect |";
+
+for (<$mreader>) {
+
+    if (/crop = (.*)/g) {
+        $obj{mreader}->{'crop'} = $1;
+    }
+}
+close $mreader;
+
+for (my $pass = 1; $pass <= 2; $pass++) {
+
+    open my $ffmpeg,
+
+      "ffmpeg -i \"$ARGV[0]\" -y \"$ARGV[1]\" -fpre $ENV{MUTATE_HOME}/presets/mwriter.$obj{options}->{preset} -filter:v \"crop=$obj{mreader}->{crop}\" "
+      . "-pass $pass -passlogfile /tmp/.mutate/mwriter.pass 1> /tmp/.mutate/mwriter.out 2> /tmp/.mutate/mwriter.err |";
+
+    print while <$ffmpeg>;
+    close $ffmpeg;
+}
+
+exit(0);
+
+__END__
+
+=head1 SYNOPSIS
+
+<file/device> <output.webm> [options]
+
+Options:
+
+    -h, -?, --help  This help / usage screen...
+    -p, --preset    Type 'mpresets mwriter' for a complete list of presets.
+
+Example: mwriter file.mp4 output.webm -p webm1080
+
+=cut

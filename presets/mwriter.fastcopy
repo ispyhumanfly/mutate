@@ -1,0 +1,8 @@
+s=720x480
+codec:v=copy
+threads=2
+
+#ignored unless using -pass 2
+
+codec:a=copy
+threads=2

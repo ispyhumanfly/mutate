@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+
+BEGIN {
+
+    mkdir '/tmp/.mutate/'
+      unless -e '/tmp/.mutate/';  
+};
+
+use 5.010_000;
+use strict;
+use warnings;
+
+unless (-e '/tmp/.mutate/mdaemon.pid')
+{
+
+    $ENV{MOJO_HOME} = $ENV{MUTATE_HOME};
+    $ENV{MOJO_MAX_MESSAGE_SIZE} = 0; #1000000000000;
+
+    system
+      "hypnotoad $ENV{MUTATE_HOME}/mdaemon 1> /tmp/.mutate/mdaemon.out 2> /tmp/.mutate/mdaemon.err";
+}
+
+exit(0);

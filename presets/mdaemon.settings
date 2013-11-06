@@ -1,0 +1,18 @@
+{ 
+    "title"       : "mdaemon",
+    "description" : "High Performance Video Encoding",
+    "domain"      : "mutate.thoughtpivot.com",
+    "tmp"         : "/tmp/.mutate/",
+    "encoding"    : "UTF-8",
+    
+    "hypnotoad" :
+     
+    {
+        "listen"    : ["http://*:3000", "https://*:8443"],
+        "pid_file"  : "/tmp/.mutate/mdaemon.pid",
+        "lock_file" : "/tmp/.mutate/mdaemon.lock",
+        "log_file"  : "/tmp/.mutate/mdaemon.log",
+        "workers"   : "5",
+        "proxy"     : 1
+    }
+}

@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+
+BEGIN {
+
+    unless ((exists $ENV{MUTATE_HOME}) and (-d $ENV{MUTATE_HOME})) {
+        die
+          "You must set MUTATE_HOME to the directory where Mutate is located.\n";        
+    }
+}
+
+use 5.010_000;
+use strict;
+use warnings;
+
+use Mojolicious::Lite;
+use Mojo::JSON;
+
+plugin 'JSONConfig' => {file => "$ENV{MUTATE_HOME}/presets/mdaemon.settings"};
+
+
+get '/' => sub { my $self = shift; };
+
+get '/mpresets' => sub {
+    
+    my $self = shift;
+    
+    my $tx = $self->req->json;
+    
+    open my $shell, "mpresets $tx->{arguments} |"; 
+    
+    my @output;
+
+    for (<$shell>) {
+        push @output, $_;    
+    }
+    close $shell;
+    
+    return $self->render(json => \@output);
+
+};
+
+app->start;

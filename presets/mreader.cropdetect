@@ -1,0 +1,8 @@
+[cropdetect]
+profile-desc="Say something" 
+ao=null
+vo=null
+msglevel=identify=6
+ss=30
+endpos=30
+vf=cropdetect=yes
