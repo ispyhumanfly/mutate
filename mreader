@@ -25,7 +25,8 @@ my %obj;
 GetOptions(
     
     'help|?|h'   => \$obj{options}->{'help'},
-    'preset|p=s' => \$obj{options}->{'preset'}
+    'preset|p=s' => \$obj{options}->{'preset'},
+    'daemonize|d' => \$obj{options}->{'daemonize'}
 );
 
 pod2usage "\nmreader, Read A/V Media Data\n"
@@ -37,44 +38,58 @@ unless (defined $obj{options}->{preset})
     $obj{options}->{preset} = 'normal';
 }
 
-find(\&process, @ARGV);
+unless (defined $obj{options}->{'daemonize'}) {
 
-sub process {
-
-    if ($File::Find::name
-        =~ /\.(mp2|mp3|mp4|mkv|mov|avi|wmv|webm|ogg|flv|vob)$/x)
-    {
-
-        my @crop_detect;
-
-        say "$File::Find::name";
-
-        open my $mplayer,
-
-          "mplayer \"$_\" -include $ENV{MUTATE_HOME}/presets/mreader.$obj{options}->{preset} "
-          . " -profile $obj{options}->{preset} 2> /tmp/.mutate/mreader.err |";
-
-        for (<$mplayer>) {
-            when (/\w+:=(.*)/x) {
-                say "\t" . lc($1) . " = $2";
+    find(\&process, @ARGV);
+    
+    sub process {
+    
+        if ($File::Find::name
+            =~ /\.(mp2|mp3|mp4|mkv|mov|avi|wmv|webm|ogg|flv|vob)$/x)
+        {
+    
+            my @crop_detect;
+    
+            say "$File::Find::name";
+    
+            open my $mplayer,
+    
+              "mplayer \"$_\" -include $ENV{MUTATE_HOME}/presets/mreader.$obj{options}->{preset} "
+              . " -profile $obj{options}->{preset} 2> /tmp/.mutate/mreader.err |";
+    
+            for (<$mplayer>) {
+                when (/\w+:=(.*)/x) {
+                    say "\t" . lc($1) . " = $2";
+                }
+                when (/ID_(\w+)=(.*)/x) {
+                    say "\t" . lc($1) . " = $2";
+                }
+                when (/ID_(\w+)_(\w+)=(.*)/x) {
+                    say "\t" . lc("$1 $2") . " = $3";
+                }
+                when (/.*crop=(\d+:\d+:\d+:\d+)/x) {
+                    push @crop_detect, $1;
+                }
             }
-            when (/ID_(\w+)=(.*)/x) {
-                say "\t" . lc($1) . " = $2";
+    
+            if (scalar @crop_detect > 1) {
+                say "\tcrop = " . $crop_detect[-1];
             }
-            when (/ID_(\w+)_(\w+)=(.*)/x) {
-                say "\t" . lc("$1 $2") . " = $3";
-            }
-            when (/.*crop=(\d+:\d+:\d+:\d+)/x) {
-                push @crop_detect, $1;
-            }
+    
+            close $mplayer;
         }
-
-        if (scalar @crop_detect > 1) {
-            say "\tcrop = " . $crop_detect[-1];
-        }
-
-        close $mplayer;
     }
+}
+else {
+    
+    use Mojo::UserAgent;
+
+    my $ua = Mojo::UserAgent->new;
+
+    my $tx = $ua->get("https://localhost:8443/mreader" => {DNT => 1} => json => {arguments => "@ARGV"});
+
+    say $tx->res->body;
+    
 }
 
 exit(0);
@@ -89,6 +104,7 @@ Options:
 
     -h, -?, --help  This help / usage screen...
     -p, --preset    Type 'mpresets mreader' for a complete list of presets.
+    -d, --daemonize Daemonize this task on a Mutate distributed cloud.
 
 Example: mreader ~/Videos/movie.mp4
 

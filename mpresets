@@ -21,37 +21,54 @@ use Pod::Usage;
 use File::Find;
 use File::Basename;
 
+
 my %obj;
 
 GetOptions(
 
     'help|?|h' => \$obj{options}->{'help'},
+    'daemonize|d' => \$obj{options}->{'daemonize'}
 );
 
 pod2usage "\nmpresets, Display Mutate Presets\n"
   if defined $obj{options}->{help}
   or not $ARGV[0];
 
-find(\&process, "$ENV{MUTATE_HOME}/presets/");
-
-sub process {
-
-    if (basename($File::Find::name) =~ /(\w+).(\w+)/) {
-        push @{$obj{presets}->{$1}}, $2;
-    }
-}
-
-for my $command (@ARGV) {
+unless (defined $obj{options}->{'daemonize'}) {
     
-    for (keys %{$obj{presets}}) {
+    find(\&process, "$ENV{MUTATE_HOME}/presets/");
     
-        if ($command eq $_) {
-        
-            say $_;
-            say "\t$_" for @{$obj{presets}->{$_}};
+    sub process {
+    
+        if (basename($File::Find::name) =~ /(\w+).(\w+)/) {
+            push @{$obj{presets}->{$1}}, $2;
         }
     }
+    
+    for my $command (@ARGV) {
+        
+        for (keys %{$obj{presets}}) {
+        
+            if ($command eq $_) {
+            
+                say $_;
+                say "\t$_" for @{$obj{presets}->{$_}};
+            }
+        }
+    }
+
 }
+else {
+    
+    use Mojo::UserAgent;
+
+    my $ua = Mojo::UserAgent->new;
+
+    my $tx = $ua->get("https://localhost:8443/mpresets" => {DNT => 1} => json => {arguments => "@ARGV"});
+
+    say $tx->res->body;
+}
+
 
 exit(0);
 
@@ -64,6 +81,7 @@ __END__
 Options:
 
     -h, -?, --help  This help / usage screen...
+    -d, --daemonize Daemonize this task on a Mutate distributed cloud.
 
 Example: mpresets mreader mwriter
 

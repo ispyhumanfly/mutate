@@ -25,7 +25,9 @@ my %obj;
 GetOptions(
 
     'help|?|h'   => \$obj{options}->{'help'},
-    'preset|p=s' => \$obj{options}->{'preset'}
+    'preset|p=s' => \$obj{options}->{'preset'},
+    'daemonize|d' => \$obj{options}->{'daemonize'}
+
 );
 
 pod2usage "\nmwriter, 2-Pass A/V Encoder\n"
@@ -33,32 +35,45 @@ pod2usage "\nmwriter, 2-Pass A/V Encoder\n"
   or not $ARGV[0]
   or not $ARGV[1];
 
-unless (defined $obj{options}->{preset})
-{
-    $obj{options}->{preset} = 'fastcopy';
-}
+unless (defined $obj{options}->{'daemonize'}) {
 
-open my $mreader,
-
-  "mreader \"$ARGV[0]\" -p cropdetect |";
-
-for (<$mreader>) {
-
-    if (/crop = (.*)/g) {
-        $obj{mreader}->{'crop'} = $1;
+    unless (defined $obj{options}->{preset})
+    {
+        $obj{options}->{preset} = 'fastcopy';
+    }
+    
+    open my $mreader,
+    
+      "$ENV{MUTATE_HOME}/mreader \"$ARGV[0]\" -p cropdetect |";
+    
+    for (<$mreader>) {
+    
+        if (/crop = (.*)/g) {
+            $obj{mreader}->{'crop'} = $1;
+        }
+    }
+    close $mreader;
+    
+    for (my $pass = 1; $pass <= 2; $pass++) {
+    
+        open my $ffmpeg,
+    
+          "ffmpeg -i \"$ARGV[0]\" -y \"$ARGV[1]\" -fpre $ENV{MUTATE_HOME}/presets/mwriter.$obj{options}->{preset} -filter:v \"crop=$obj{mreader}->{crop}\" "
+          . "-pass $pass -passlogfile /tmp/.mutate/mwriter.pass 1> /tmp/.mutate/mwriter.out 2> /tmp/.mutate/mwriter.err |";
+    
+        print while <$ffmpeg>;
+        close $ffmpeg;
     }
 }
-close $mreader;
+else {
 
-for (my $pass = 1; $pass <= 2; $pass++) {
+    use Mojo::UserAgent;
 
-    open my $ffmpeg,
+    my $ua = Mojo::UserAgent->new;
 
-      "ffmpeg -i \"$ARGV[0]\" -y \"$ARGV[1]\" -fpre $ENV{MUTATE_HOME}/presets/mwriter.$obj{options}->{preset} -filter:v \"crop=$obj{mreader}->{crop}\" "
-      . "-pass $pass -passlogfile /tmp/.mutate/mwriter.pass 1> /tmp/.mutate/mwriter.out 2> /tmp/.mutate/mwriter.err |";
+    my $tx = $ua->get("https://localhost:8443/mwriter" => {DNT => 1} => json => {arguments => "@ARGV"});
 
-    print while <$ffmpeg>;
-    close $ffmpeg;
+    say $tx->res->body;    
 }
 
 exit(0);
@@ -73,6 +88,7 @@ Options:
 
     -h, -?, --help  This help / usage screen...
     -p, --preset    Type 'mpresets mwriter' for a complete list of presets.
+    -d, --daemonize Daemonize this task on a Mutate distributed cloud.
 
 Example: mwriter file.mp4 output.webm -p webm1080
 

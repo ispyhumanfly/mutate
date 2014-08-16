@@ -1,6 +1,6 @@
 { 
     "title"       : "mdaemon",
-    "description" : "High Performance Video Encoding",
+    "description" : "High Performance A/V Encoding",
     "domain"      : "mutate.thoughtpivot.com",
     "tmp"         : "/tmp/.mutate/",
     "encoding"    : "UTF-8",

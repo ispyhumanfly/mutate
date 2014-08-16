@@ -4,7 +4,7 @@ BEGIN {
 
     unless ((exists $ENV{MUTATE_HOME}) and (-d $ENV{MUTATE_HOME})) {
         die
-          "You must set MUTATE_HOME to the directory where Mutate is located.\n";        
+          "You must set MUTATE_HOME to the directory where Mutate is located.\n";
     }
 }
 
@@ -20,22 +20,24 @@ plugin 'JSONConfig' => {file => "$ENV{MUTATE_HOME}/presets/mdaemon.settings"};
 
 get '/' => sub { my $self = shift; };
 
-get '/mpresets' => sub {
-    
+get '/:command' => sub {
+
     my $self = shift;
-    
+
     my $tx = $self->req->json;
-    
-    open my $shell, "mpresets $tx->{arguments} |"; 
-    
+
+    my $command = $self->param('command');
+
+    open my $shell, "$ENV{MUTATE_HOME}/$command $tx->{arguments} |";
+
     my @output;
 
     for (<$shell>) {
-        push @output, $_;    
+        push @output, $_;
     }
     close $shell;
-    
-    return $self->render(json => \@output);
+
+    return $self->render(text => "@output");
 
 };
 
