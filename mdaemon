@@ -12,6 +12,9 @@ use 5.010_000;
 use strict;
 use warnings;
 
+use IO::File;
+use DateTime;
+
 use Mojolicious::Lite;
 use Mojo::JSON;
 
@@ -28,6 +31,8 @@ get '/:command' => sub {
 
     my $command = $self->param('command');
 
+    my $task_file = IO::File->new("/tmp/.mutate/tasks/$command." . DateTime->now . "", "w");
+    
     open my $shell, "$ENV{MUTATE_HOME}/$command $tx->{arguments} |";
 
     my @output;
@@ -36,6 +41,11 @@ get '/:command' => sub {
         push @output, $_;
     }
     close $shell;
+
+    if (defined $task_file) {
+        print $task_file "@output";
+        undef $task_file;
+    }
 
     return $self->render(text => "@output");
 

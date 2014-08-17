@@ -26,7 +26,7 @@ GetOptions(
     
     'help|?|h'   => \$obj{options}->{'help'},
     'preset|p=s' => \$obj{options}->{'preset'},
-    'daemonize|d' => \$obj{options}->{'daemonize'}
+    'task|t' => \$obj{options}->{'task'}
 );
 
 pod2usage "\nmreader, Read A/V Media Data\n"
@@ -38,7 +38,7 @@ unless (defined $obj{options}->{preset})
     $obj{options}->{preset} = 'normal';
 }
 
-unless (defined $obj{options}->{'daemonize'}) {
+if (not defined $obj{options}->{'task'}) {
 
     find(\&process, @ARGV);
     
@@ -102,9 +102,9 @@ __END__
 
 Options:
 
-    -h, -?, --help  This help / usage screen...
-    -p, --preset    Type 'mpresets mreader' for a complete list of presets.
-    -d, --daemonize Daemonize this task on a Mutate distributed cloud.
+    -h, -?, --help This help / usage screen...
+    -p, --preset   Type 'mpresets mreader' for a complete list of presets.
+    -t, --task     Pin this task onto a Mutate distributed network.
 
 Example: mreader ~/Videos/movie.mp4
 

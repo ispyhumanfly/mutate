@@ -3,7 +3,8 @@
 BEGIN {
 
     if ((exists $ENV{MUTATE_HOME}) and (-d $ENV{MUTATE_HOME})) {
-        mkdir '/tmp/.mutate/' unless -e '/tmp/.mutate/';  
+        mkdir '/tmp/.mutate/' unless -e '/tmp/.mutate/';
+        mkdir '/tmp/.mutate/tasks/' unless -e '/tmp/.mutate/tasks/';
     }
     else {
         die
@@ -22,7 +23,7 @@ unless (-e '/tmp/.mutate/mdaemon.pid')
     $ENV{MOJO_MAX_MESSAGE_SIZE} = 1000000000000;
 
     system
-      "hypnotoad $ENV{MUTATE_HOME}/mdaemon 1> /tmp/.mutate/mdaemon.out 2> /tmp/.mutate/mdaemon.err";
+      "hypnotoad $ENV{MUTATE_HOME}/mdaemon";
 }
 
 exit(0);

@@ -26,7 +26,7 @@ GetOptions(
 
     'help|?|h'   => \$obj{options}->{'help'},
     'preset|p=s' => \$obj{options}->{'preset'},
-    'daemonize|d' => \$obj{options}->{'daemonize'}
+    'task|d' => \$obj{options}->{'task'}
 
 );
 
@@ -35,7 +35,7 @@ pod2usage "\nmwriter, 2-Pass A/V Encoder\n"
   or not $ARGV[0]
   or not $ARGV[1];
 
-unless (defined $obj{options}->{'daemonize'}) {
+unless (defined $obj{options}->{'task'}) {
 
     unless (defined $obj{options}->{preset})
     {
@@ -88,7 +88,7 @@ Options:
 
     -h, -?, --help  This help / usage screen...
     -p, --preset    Type 'mpresets mwriter' for a complete list of presets.
-    -d, --daemonize Daemonize this task on a Mutate distributed cloud.
+    -t, --task      Pin this task onto a Mutate distributed network.
 
 Example: mwriter file.mp4 output.webm -p webm1080
 
