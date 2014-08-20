@@ -7,7 +7,7 @@ BEGIN {
     }
     else {
         die
-          "You must set MUTATE_HOME to the directory where Mutate is located.\n";        
+          "You must set MUTATE_HOME to the directory where Mutate is located.\n";
     }
 }
 
@@ -23,40 +23,39 @@ use File::Find;
 my %obj;
 
 GetOptions(
-    
+
     'help|?|h'   => \$obj{options}->{'help'},
     'preset|p=s' => \$obj{options}->{'preset'},
-    'task|t' => \$obj{options}->{'task'}
+    'task|t'     => \$obj{options}->{'task'}
 );
 
 pod2usage "\nmreader, Read A/V Media Data\n"
   if defined $obj{options}->{help}
   or not $ARGV[0];
 
-unless (defined $obj{options}->{preset})
-{
+unless (defined $obj{options}->{preset}) {
     $obj{options}->{preset} = 'normal';
 }
 
 if (not defined $obj{options}->{'task'}) {
 
     find(\&process, @ARGV);
-    
+
     sub process {
-    
+
         if ($File::Find::name
             =~ /\.(mp2|mp3|mp4|mkv|mov|avi|wmv|webm|ogg|flv|vob)$/x)
         {
-    
+
             my @crop_detect;
-    
+
             say "$File::Find::name";
-    
+
             open my $mplayer,
-    
+
               "mplayer \"$_\" -include $ENV{MUTATE_HOME}/presets/mreader.$obj{options}->{preset} "
               . " -profile $obj{options}->{preset} 2> /tmp/.mutate/mreader.err |";
-    
+
             for (<$mplayer>) {
                 when (/\w+:=(.*)/x) {
                     say "\t" . lc($1) . " = $2";
@@ -71,25 +70,27 @@ if (not defined $obj{options}->{'task'}) {
                     push @crop_detect, $1;
                 }
             }
-    
+
             if (scalar @crop_detect > 1) {
                 say "\tcrop = " . $crop_detect[-1];
             }
-    
+
             close $mplayer;
         }
     }
 }
 else {
-    
+
     use Mojo::UserAgent;
 
     my $ua = Mojo::UserAgent->new;
 
-    my $tx = $ua->get("https://localhost:8443/mreader" => {DNT => 1} => json => {arguments => "@ARGV"});
+    my $tx =
+      $ua->get("https://localhost:8443/mreader" => {DNT => 1} => json =>
+          {arguments => "@ARGV"});
 
     say $tx->res->body;
-    
+
 }
 
 exit(0);

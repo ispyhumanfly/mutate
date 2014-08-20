@@ -26,7 +26,7 @@ my %obj;
 GetOptions(
 
     'help|?|h' => \$obj{options}->{'help'},
-    'task|d' => \$obj{options}->{'task'}
+    'task|d'   => \$obj{options}->{'task'}
 );
 
 pod2usage "\nmpresets, Display Mutate Presets\n"
@@ -34,22 +34,22 @@ pod2usage "\nmpresets, Display Mutate Presets\n"
   or not $ARGV[0];
 
 unless (defined $obj{options}->{'task'}) {
-    
+
     find(\&process, "$ENV{MUTATE_HOME}/presets/");
-    
+
     sub process {
-    
+
         if (basename($File::Find::name) =~ /(\w+).(\w+)/) {
             push @{$obj{presets}->{$1}}, $2;
         }
     }
-    
+
     for my $command (@ARGV) {
-        
+
         for (keys %{$obj{presets}}) {
-        
+
             if ($command eq $_) {
-            
+
                 say $_;
                 say "\t$_" for @{$obj{presets}->{$_}};
             }
@@ -58,12 +58,14 @@ unless (defined $obj{options}->{'task'}) {
 
 }
 else {
-    
+
     use Mojo::UserAgent;
 
     my $ua = Mojo::UserAgent->new;
 
-    my $tx = $ua->get("https://localhost:8443/mpresets" => {DNT => 1} => json => {arguments => "@ARGV"});
+    my $tx =
+      $ua->get("https://localhost:8443/mpresets" => {DNT => 1} => json =>
+          {arguments => "@ARGV"});
 
     say $tx->res->body;
 }

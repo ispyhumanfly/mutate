@@ -31,8 +31,9 @@ get '/:command' => sub {
 
     my $command = $self->param('command');
 
-    my $task_file = IO::File->new("/tmp/.mutate/tasks/$command." . DateTime->now . "", "w");
-    
+    my $task_file =
+      IO::File->new("/tmp/.mutate/tasks/$command." . DateTime->now . "", "w");
+
     open my $shell, "$ENV{MUTATE_HOME}/$command $tx->{arguments} |";
 
     my @output;
