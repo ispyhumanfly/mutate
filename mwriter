@@ -26,7 +26,7 @@ GetOptions(
 
     'help|?|h'   => \$obj{options}->{'help'},
     'preset|p=s' => \$obj{options}->{'preset'},
-    'task|d' => \$obj{options}->{'task'}
+    'task|t' => \$obj{options}->{'task'}
 
 );
 
