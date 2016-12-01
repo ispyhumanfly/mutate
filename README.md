@@ -1,5 +1,5 @@
-# mutate
-Lightspeed transcoding across multiple compute resources.
+# Mutate
+A massively parallel audio and video transcoding solver.
 
 ## License
 MIT
