@@ -109,8 +109,9 @@ __END__
 Options:
 
     -h, -?, --help This help / usage screen...
-    -p, --preset   Type 'mpresets mreader' for a complete list of presets.
-    -t, --task     Pin this task onto a Mutate distributed network.
+    -p, --preset    Type 'mpresets mwriter' for a complete list of presets.
+    -e, --event     Submit this invocation to Mutate's Event Loop.
+    -o, --output    Future: Format console output as JSON, YAML, XML
 
 Example: mreader ~/Videos/movie.mp4
 

@@ -91,7 +91,8 @@ Options:
 
     -h, -?, --help  This help / usage screen...
     -p, --preset    Type 'mpresets mwriter' for a complete list of presets.
-    -t, --task      Pin this task onto a Mutate distributed network.
+    -e, --event     Submit this invocation to Mutate's Event Loop.
+    -o, --output    Future: Format console output as JSON, YAML, XML
 
 Example: mwriter file.mp4 output.webm -p webm1080
 

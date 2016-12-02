@@ -86,7 +86,7 @@ __END__
 Options:
 
     -h, -?, --help  This help / usage screen...
-    -t, --task      Submit this invocation to the task schedular.
+    -e, --event     Submit this invocation to Mutate's Event Loop.
     -o, --output    Future: Format console output as JSON, YAML, XML
 
 Example: mpresets mreader mwriter
