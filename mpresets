@@ -11,9 +11,12 @@ BEGIN {
     }
 }
 
-use 5.010_000;
+use 5.018_000;
 use strict;
 use warnings;
+
+no if $] >= 5.018, warnings => "experimental::smartmatch";
+no if $] >= 5.018, warnings => "experimental::lexical_subs";
 
 use Getopt::Long qw/:config no_ignore_case /;
 use Pod::Usage;
@@ -26,7 +29,8 @@ my %obj;
 GetOptions(
 
     'help|?|h' => \$obj{options}->{'help'},
-    'task|d'   => \$obj{options}->{'task'}
+    'task|d'   => \$obj{options}->{'task'},
+    'all|f'   => \$obj{options}->{'all'}
 );
 
 pod2usage "\nmpresets, Display Mutate Presets\n"
@@ -82,7 +86,8 @@ __END__
 Options:
 
     -h, -?, --help  This help / usage screen...
-    -t, --task      Pin this task onto a Mutate distributed network.
+    -t, --task      Submit this invocation to the task schedular.
+    -o, --output    Format console output as JSON, YAML, XML
 
 Example: mpresets mreader mwriter
 

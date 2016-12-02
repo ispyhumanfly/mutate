@@ -15,10 +15,15 @@ use 5.018_000;
 use strict;
 use warnings;
 
+no if $] >= 5.018, warnings => "experimental::smartmatch";
+no if $] >= 5.018, warnings => "experimental::lexical_subs";
+
 use Getopt::Long qw/:config no_ignore_case /;
 use Pod::Usage;
 use File::Find;
 use File::Basename;
+
+use Mojo::JSON;
 
 my %obj;
 

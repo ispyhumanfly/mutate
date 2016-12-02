@@ -8,9 +8,12 @@ BEGIN {
     }
 }
 
-use 5.010_000;
+use 5.018_000;
 use strict;
 use warnings;
+
+no if $] >= 5.018, warnings => "experimental::smartmatch";
+no if $] >= 5.018, warnings => "experimental::lexical_subs";
 
 use IO::File;
 use DateTime;
@@ -32,7 +35,7 @@ get '/:command' => sub {
 
     my $command = $self->param('command');
 
-    my $task_file =
+    my $tasks =
       IO::File->new("/tmp/.mutate/tasks/$command." . DateTime->now . "", "w");
 
     open my $shell, "$ENV{MUTATE_HOME}/$command $tx->{arguments} |";
@@ -40,16 +43,16 @@ get '/:command' => sub {
     my @output;
 
     for (<$shell>) {
-        push @output, $_;
+        push @output, chomp $_;
     }
     close $shell;
 
-    if (defined $task_file) {
-        print $task_file "@output";
-        undef $task_file;
+    if (defined $tasks) {
+        print $tasks "@output";
+        undef $tasks;
     }
 
-    return $self->render(text => "@output");
+    return $self->render(json => @output);
 
 };
 
