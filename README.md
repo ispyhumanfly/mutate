@@ -1,5 +1,5 @@
 # Mutate
-Parallel media transcoder for high performance computing environments.
+Massively parallel media transcoder for high performance computing environments.
 
 ## Synopsis
 
