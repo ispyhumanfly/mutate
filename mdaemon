@@ -24,6 +24,8 @@ use Mojo::IOLoop;
 
 plugin 'JSONConfig' => {file => "$ENV{MUTATE_HOME}/presets/mdaemon.settings"};
 
+use IO::Async::Loop::Mojo;
+our $LOOP = IO::Async::Loop::Mojo->new();
 
 get '/' => sub { my $self = shift; };
 
@@ -38,19 +40,22 @@ get '/:command' => sub {
     my $tasks =
       IO::File->new("/tmp/.mutate/tasks/$command." . DateTime->now . "", "w");
 
-    open my $shell, "$ENV{MUTATE_HOME}/$command $tx->{arguments} |";
+    $LOOP->add(
 
-    my @output;
+        open my $shell, "$ENV{MUTATE_HOME}/$command $tx->{arguments} |";
 
-    for (<$shell>) {
-        push @output, chomp $_;
-    }
-    close $shell;
+            my @output;
 
-    if (defined $tasks) {
-        print $tasks "@output";
-        undef $tasks;
-    }
+            for (<$shell>) {
+                push @output, chomp $_;
+            }
+            close $shell;
+
+            if (defined $tasks) {
+                print $tasks "@output";
+                undef $tasks;
+            }
+        );
 
     return $self->render(json => @output);
 

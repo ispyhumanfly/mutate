@@ -87,7 +87,7 @@ Options:
 
     -h, -?, --help  This help / usage screen...
     -t, --task      Submit this invocation to the task schedular.
-    -o, --output    Format console output as JSON, YAML, XML
+    -o, --output    Future: Format console output as JSON, YAML, XML
 
 Example: mpresets mreader mwriter
 

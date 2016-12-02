@@ -1,11 +1,11 @@
 # Mutate
-Massively parallel media transcoder for high performance computing environments.
+A multi-node, multi-threaded and massively parallel media transcoder.
 
 ## Synopsis
 
 ### Example: Basic Usage
 
-Check out the available command presets before diving in...
+Check out the available presets for each command before diving in...
 
     mpresets mreader mwriter
 
