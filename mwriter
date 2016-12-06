@@ -29,16 +29,16 @@ GetOptions(
 
     'help|?|h'   => \$obj{options}->{'help'},
     'preset|p=s' => \$obj{options}->{'preset'},
-    'task|t' => \$obj{options}->{'task'}
+    'event|e'   => \$obj{options}->{'event'},
 
 );
 
-pod2usage "\nmwriter, 2-Pass A/V Encoder\n"
+pod2usage "\nmwriter, Distributed 2-Pass A/V Encoder\n"
   if defined $obj{options}->{help}
   or not $ARGV[0]
   or not $ARGV[1];
 
-unless (defined $obj{options}->{'task'}) {
+unless (defined $obj{options}->{'event'}) {
 
     unless (defined $obj{options}->{preset})
     {

@@ -29,15 +29,14 @@ my %obj;
 GetOptions(
 
     'help|?|h' => \$obj{options}->{'help'},
-    'task|d'   => \$obj{options}->{'task'},
-    'all|f'   => \$obj{options}->{'all'}
+    'event|e'   => \$obj{options}->{'event'},
 );
 
 pod2usage "\nmpresets, Display Mutate Presets\n"
   if defined $obj{options}->{help}
   or not $ARGV[0];
 
-unless (defined $obj{options}->{'task'}) {
+unless (defined $obj{options}->{'event'}) {
 
     find(\&process, "$ENV{MUTATE_HOME}/presets/");
 

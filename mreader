@@ -31,10 +31,10 @@ GetOptions(
 
     'help|?|h'   => \$obj{options}->{'help'},
     'preset|p=s' => \$obj{options}->{'preset'},
-    'task|t'     => \$obj{options}->{'task'}
+    'event|e'   => \$obj{options}->{'event'},
 );
 
-pod2usage "\nmreader, Read A/V Media Data\n"
+pod2usage "\nmreader, Distributed A/V Media Reader\n"
   if defined $obj{options}->{help}
   or not $ARGV[0];
 
@@ -42,7 +42,7 @@ unless (defined $obj{options}->{preset}) {
     $obj{options}->{preset} = 'normal';
 }
 
-if (not defined $obj{options}->{'task'}) {
+if (not defined $obj{options}->{'event'}) {
 
     find(\&process, @ARGV);
 
@@ -54,7 +54,7 @@ if (not defined $obj{options}->{'task'}) {
 
             my @crop_detect;
 
-            say basename($File::Find::name);
+            say $File::Find::name;
 
             open my $mplayer,
 

@@ -4,7 +4,7 @@ BEGIN {
 
     if ((exists $ENV{MUTATE_HOME}) and (-d $ENV{MUTATE_HOME})) {
         mkdir '/tmp/.mutate/' unless -e '/tmp/.mutate/';
-        mkdir '/tmp/.mutate/tasks/' unless -e '/tmp/.mutate/tasks/';
+        mkdir '/tmp/.mutate/events/' unless -e '/tmp/.mutate/events/';
     }
     else {
         die

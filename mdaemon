@@ -21,10 +21,10 @@ use DateTime;
 use Mojolicious::Lite;
 use Mojo::JSON;
 use Mojo::IOLoop;
+use IO::Async::Loop::Mojo;
 
 plugin 'JSONConfig' => {file => "$ENV{MUTATE_HOME}/presets/mdaemon.settings"};
 
-use IO::Async::Loop::Mojo;
 our $LOOP = IO::Async::Loop::Mojo->new();
 
 get '/' => sub { my $self = shift; };
@@ -37,8 +37,8 @@ get '/:command' => sub {
 
     my $command = $self->param('command');
 
-    my $tasks =
-      IO::File->new("/tmp/.mutate/tasks/$command." . DateTime->now . "", "w");
+    my $event =
+      IO::File->new("/tmp/.mutate/events/$command." . DateTime->now . "", "w");
 
     $LOOP->add(
 
@@ -51,14 +51,11 @@ get '/:command' => sub {
             }
             close $shell;
 
-            if (defined $tasks) {
-                print $tasks "@output";
-                undef $tasks;
+            if (defined $event) {
+                print $event "@output";
+                undef $event;
             }
         );
-
-    return $self->render(json => @output);
-
-};
+    };
 
 app->start;
