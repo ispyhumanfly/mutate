@@ -19,8 +19,6 @@ use IO::File;
 use DateTime;
 
 use Mojolicious::Lite;
-use Mojo::JSON;
-use Mojo::IOLoop;
 use IO::Async::Loop::Mojo;
 
 plugin 'JSONConfig' => {file => "$ENV{MUTATE_HOME}/presets/mdaemon.settings"};
