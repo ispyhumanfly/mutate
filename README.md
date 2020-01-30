@@ -21,6 +21,14 @@ Easily convert any supported media type to another...
 
     mwriter -p webm1080 -t my_video.mp4 my_smaller_video.webm
 
+## Installation Notes
+
+Crude right now, but leveraging cpanminus and the cpanfile format for declaring dependencies. 
+
+    sudo cpanm --installdeps .  
+
+I know I should have perlbrew based instructions and have these deps installed locally. I know, maybe we'll get there...
+
 ## License
 MIT
 
