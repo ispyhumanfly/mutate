@@ -42,18 +42,18 @@ get '/:command' => sub {
 
         open my $shell, "$ENV{MUTATE_HOME}/$command $tx->{arguments} |";
 
-            my @output;
+        my @output;
 
-            for (<$shell>) {
-                push @output, chomp $_;
-            }
-            close $shell;
+        for (<$shell>) {
+            push @output, chomp $_;
+        }
+        close $shell;
 
-            if (defined $event) {
-                print $event "@output";
-                undef $event;
-            }
-        );
-    };
+        if (defined $event) {
+            print $event "@output";
+            undef $event;
+        }
+    );
+};
 
 app->start;
